@@ -1,4 +1,3 @@
-const axios = require('axios');
 const ffmpeg = require('fluent-ffmpeg');
 const pathToFfmpeg = require('ffmpeg-static');
 ffmpeg.setFfmpegPath(pathToFfmpeg)
@@ -8,52 +7,17 @@ const fs = require('fs-extra');
 require('dotenv').config();
 
 
-//const HF_API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
-const HF_API_URL = "https://api-inference.huggingface.co/models/Corcelio/mobius"
-
-const HF_API_KEY = process.env.HF_API_KEY;
 
 
 const generateVideo = async (req, res) => {
     const { prompts } = req.body;
-    const imagePaths = [];
 
+    const imagePaths = prompts.map((_, index) => path.join(__dirname, '..', 'output', `image${index}.png`));
+    const videoPath = path.join(__dirname, '..', 'output', 'video.mp4');
     try {
-        // Ensure the output directory exists
-        const outputDir = path.join(__dirname, '..', 'output');
-        await fs.ensureDir(outputDir);
-
-        // Generate images from prompts
-        for (let i = 0; i < prompts.length; i++) {
-            const prompt = prompts[i];
-            console.log(`Generating image for prompt ${i}: ${prompt}`); // Debugging statement
-
-            const response = await axios.post(HF_API_URL, {
-                inputs: prompt
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${HF_API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                responseType: 'arraybuffer'
-            });
-
-            if (response.status !== 200) {
-                console.error(`Error from API for prompt ${i}:`, response.data); // Debugging statement
-                return res.status(response.status).json({ error: 'Error generating image from API' });
-            }
-
-            const buffer = Buffer.from(response.data, 'binary');
-            const imagePath = path.join(outputDir, `image${i}.png`);
-            await fs.writeFile(imagePath, buffer);
-            imagePaths.push(imagePath);
-            console.log(`Image saved at ${imagePath}`); // Debugging statement
-        }
-
         // Generate video from images
-        const videoPath = path.join(outputDir, 'video.mp4');
-        const ffmpegCommand = ffmpeg();
 
+        const ffmpegCommand = ffmpeg();
 
         imagePaths.forEach((imagePath, index) => {
             ffmpegCommand.input(imagePath);
@@ -81,13 +45,13 @@ const generateVideo = async (req, res) => {
                     } else {
                         const videoUrl = `/output/video.mp4`;
                         console.log(`Video URL to send to frontend: ${videoUrl}`);
-                        res.json({ videoUrl });
+                        res.json({ videoUrl }); //??
                     }
                 })
             })
             .on('error', (err) => {
                 console.error('Error generating video:', err); // Debugging statement
-                //res.status(500).json({ error: err.message });
+                res.status(500).json({ error: err.message });
 
             })
             .save(videoPath);

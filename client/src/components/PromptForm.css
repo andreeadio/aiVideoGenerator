@@ -1,0 +1,21 @@
+.form {
+    display: grid;
+    align-items: center;
+    text-align: justify;
+    margin-top: 30px;
+}
+
+.prompt-container {
+
+
+    display: grid;
+    align-items: center;
+    text-align: justify;
+    margin-bottom: 10px;
+
+}
+
+.generated-image {
+    max-width: 200px;
+    margin-left: 10px;
+}

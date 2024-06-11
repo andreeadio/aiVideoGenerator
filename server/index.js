@@ -7,7 +7,7 @@ const express = require('express')
 const app = express()
 
 const videoRouter = require('./routes/video');
-
+const imageRouter = require('./routes/image')
 
 //middlewares
 app.use(bodyParser.json())
@@ -23,6 +23,7 @@ app.use(cors(
 
 //routes
 app.use('/api', videoRouter)
+app.use('/api', imageRouter)
 
 app.use('/output', express.static(path.join(__dirname, 'output')));
 
