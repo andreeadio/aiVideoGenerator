@@ -30,7 +30,7 @@ body,
     height: 100%;
     background: linear-gradient(135deg, #9B59B6 25%, #0d0f63 75%);
     animation: backgroundMove 10s linear infinite;
-    opacity: 0.;
+    background-size: 200% 200%;
 }
 
 @keyframes backgroundMove {
