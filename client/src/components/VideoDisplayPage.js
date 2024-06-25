@@ -8,6 +8,29 @@ function VideoDisplayPage() {
     const location = useLocation();
     const { videoUrl } = location.state;
 
+    const handleDownloadVideo = async (url) => {
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'video/mp4',
+                },
+            });
+            const blob = await response.blob();
+            const aTag = document.createElement('a');
+            const fileName = url.split('/').pop();
+            const objectUrl = URL.createObjectURL(blob);
+            aTag.href = objectUrl;
+            aTag.download = fileName;
+            document.body.appendChild(aTag);
+            aTag.click();
+            URL.revokeObjectURL(objectUrl);
+            document.body.removeChild(aTag);
+        } catch (error) {
+            console.error('Error downloading video:', error);
+        }
+    };
+
     return (
         <div className="video-display-container">
             <Card title="Video Ready!" className="info-card">
@@ -16,7 +39,7 @@ function VideoDisplayPage() {
             <Card className="video-card">
                 <video src={videoUrl} controls />
                 <div className="download-button">
-                    <Button label="Download Video" icon="pi pi-download" onClick={() => window.location.href = videoUrl} className="p-button-primary" />
+                    <Button label="Download Video" icon="pi pi-download" onClick={() => handleDownloadVideo(videoUrl)} className="p-button-primary" />
                 </div>
             </Card>
         </div>
