@@ -1,0 +1,47 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    /* background-color: #0d0f63; */
+    background: linear-gradient(135deg, #9B59B6 25%, #0d0f63 75%);
+}
+
+.login-card {
+    width: 400px;
+    height: 350px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    background-color: #cfc1ee;
+}
+
+.p-field {
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.p-button-primary {
+    width: 100%;
+}
+
+#username {
+    height: 40px;
+
+}
+
+#password {
+    height: 40px;
+
+}

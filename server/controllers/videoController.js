@@ -1,103 +1,106 @@
-// const axios = require('axios');
-// const ffmpeg = require('fluent-ffmpeg');
-// const pathToFfmpeg = require('ffmpeg-static');
-// ffmpeg.setFfmpegPath(pathToFfmpeg)
+const ffmpeg = require('fluent-ffmpeg');
+const pathToFfmpeg = require('ffmpeg-static');
+ffmpeg.setFfmpegPath(pathToFfmpeg);
 
-// const path = require('path');
-// const fs = require('fs-extra');
-// require('dotenv').config();
+const path = require('path');
+const fs = require('fs-extra');
+const videoshow = require('videoshow');
+const Image = require('../models/Image');
+const Video = require('../models/Video');
+const { v4: uuidv4 } = require('uuid');
+require('dotenv').config();
 
+const generateVideo = async (req, res) => {
+    const { prompts } = req.body;
+    const userId = req.user.userId;
+    const outputDir = path.join(__dirname, '..', 'output');
+    const videoPath = path.join(outputDir, `video-${uuidv4()}.mp4`);
+    const tempImages = [];
 
-// //const HF_API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
-// //"https://api-inference.huggingface.co/models/Corcelio/mobius"
-// const HF_API_URL = "https://api-inference.huggingface.co/models/fluently/Fluently-XL-Final"
+    try {
+        await fs.ensureDir(outputDir);
 
+        for (let i = 0; i < prompts.length; i++) {
+            const imageRecord = await Image.findOne({ prompt: prompts[i], userId });
+            if (!imageRecord) {
+                throw new Error('Image not found in database');
+            }
+            const base64Data = imageRecord.imageData.replace(/^data:image\/png;base64,/, '');
+            const imagePath = path.join(outputDir, `temp-image-${uuidv4()}.png`);
+            await fs.writeFile(imagePath, base64Data, 'base64');
+            tempImages.push(imagePath);
+        }
 
-// const HF_API_KEY = process.env.HF_API_KEY;
+        const images = tempImages.map((imagePath) => ({
+            path: imagePath,
+        }));
 
+        const videoOptions = {
+            fps: 25,
+            loop: 5,
+            transition: true,
+            transitionDuration: 1,
+            videoBitrate: 1024,
+            videoCodec: 'libx264',
+            size: '1280x?',
+            format: 'mp4',
+            pixelFormat: 'yuv420p',
+            useSubRipSubtitles: false,
+            subtitleStyle: {
+                Fontname: 'Verdana',
+                Fontsize: '26',
+                PrimaryColour: '11861244',
+                SecondaryColour: '11861244',
+                TertiaryColour: '11861244',
+                BackColour: '-2147483640',
+                Bold: '2',
+                Italic: '0',
+                BorderStyle: '2',
+                Outline: '2',
+                Shadow: '3',
+                Alignment: '1',
+                MarginL: '40',
+                MarginR: '60',
+                MarginV: '40',
+            },
+        };
 
-// const generateVideo = async (req, res) => {
-//     const { prompts } = req.body;
-//     const imagePaths = [];
+        videoshow(images, videoOptions)
+            .save(videoPath)
+            .on('start', (command) => {
+                console.log('ffmpeg process started:', command);
+            })
+            .on('error', async (err, stdout, stderr) => {
+                console.error('Error:', err);
+                console.error('ffmpeg stderr:', stderr);
+                for (const imagePath of tempImages) {
+                    await fs.remove(imagePath);
+                }
+                res.status(500).send('Error generating video');
+            })
+            .on('end', async (output) => {
+                console.log('Video created in:', output);
+                for (const imagePath of tempImages) {
+                    await fs.remove(imagePath);
+                }
 
-//     try {
-//         // Ensure the output directory exists
-//         const outputDir = path.join(__dirname, '..', 'output');
-//         await fs.ensureDir(outputDir);
+                const video = new Video({
+                    videoUrl: `/output/${path.basename(videoPath)}`,
+                    userId,
+                });
 
-//         // Generate images from prompts
-//         for (let i = 0; i < prompts.length; i++) {
-//             const prompt = prompts[i];
-//             console.log(`Generating image for prompt ${i}: ${prompt}`); // Debugging statement
+                await video.save();
 
-//             const response = await axios.post(HF_API_URL, {
-//                 inputs: prompt
-//             }, {
-//                 headers: {
-//                     'Authorization': `Bearer ${HF_API_KEY}`,
-//                     'Content-Type': 'application/json'
-//                 },
-//                 responseType: 'arraybuffer'
-//             });
+                res.json({ videoUrl: video.videoUrl });
+            });
 
-//             if (response.status !== 200) {
-//                 console.error(`Error from API for prompt ${i}:`, response.data); // Debugging statement
-//                 return res.status(response.status).json({ error: 'Error generating image from API' });
-//             }
+    } catch (error) {
+        console.error('Error generating video:', error);
+        for (const imagePath of tempImages) {
+            await fs.remove(imagePath);
+        }
+        res.status(500).json({ error: 'Internal server error. Please try again later.' });
+    }
+};
 
-//             const buffer = Buffer.from(response.data, 'binary');
-//             const imagePath = path.join(outputDir, `image${i}.png`);
-//             await fs.writeFile(imagePath, buffer);
-//             imagePaths.push(imagePath);
-//             console.log(`Image saved at ${imagePath}`); // Debugging statement
-//         }
-
-//         // Generate video from images
-//         const videoPath = path.join(outputDir, 'video.mp4');
-//         const ffmpegCommand = ffmpeg();
-
-
-//         imagePaths.forEach((imagePath, index) => {
-//             ffmpegCommand.input(imagePath);
-//         });
-
-//         const filterComplex = imagePaths.map((_, index) => {
-//             return `[${index}:v]loop=loop=150:size=1,trim=duration=5,setsar=1[v${index}]`;
-//         }).join('; ') + `; ${imagePaths.map((_, index) => `[v${index}]`).join(' ')}concat=n=${imagePaths.length}:v=1:a=0[outv]`;
-
-
-//         ffmpegCommand
-//             .complexFilter(filterComplex, ['outv'])
-//             .outputOptions('-c:v', 'libx264', '-r', '25', '-pix_fmt', 'yuv420p')
-//             .on('start', (commandLine) => {
-//                 console.log(`FFmpeg command: ${commandLine}`)
-//             })
-//             .on('end', () => {
-//                 console.log(`Video successfully generated at ${videoPath}`); // Debugging statement
-//                 // res.json({ videoUrl: `/output/video.mp4` });
-
-//                 fs.access(videoPath, fs.constants.F_OK, (err) => {
-//                     if (err) {
-//                         console.error('Video file does not exist:', videoPath);
-//                         res.status(500).json({ error: 'Video file not found' });
-//                     } else {
-//                         const videoUrl = `/output/video.mp4`;
-//                         console.log(`Video URL to send to frontend: ${videoUrl}`);
-//                         res.json({ videoUrl });
-//                     }
-//                 })
-//             })
-//             .on('error', (err) => {
-//                 console.error('Error generating video:', err); // Debugging statement
-//                 //res.status(500).json({ error: err.message });
-
-//             })
-//             .save(videoPath);
-//     } catch (error) {
-//         console.error('Error in generateVideo:', error); // Debugging statement
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
-// module.exports = { generateVideo };
-
+module.exports = { generateVideo };

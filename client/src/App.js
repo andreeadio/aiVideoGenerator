@@ -3,35 +3,30 @@ import './App.css';
 
 
 import React, { useState } from 'react';
-import PromptForm from './components/PromptForm';
 
+import { BrowserRouter as Router, Routes, Route, Switch } from 'react-router-dom';
+import WelcomePage from "./components/WelcomePage";
+import LoginPage from "./components/LoginPage";
+import VideoGenPage from "./components/VideoGenPage"
+import RegisterPage from "./components/RegisterPage"
+import VideoDisplayPage from './components/VideoDisplayPage';
 
 function App() {
 
-
-  const [videoUrl, setVideoUrl] = useState(null);
-
-  const handleVideoGenerated = (url) => {
-
-    console.log('Video URL received:', url);
-
-    setVideoUrl(`http://localhost:8080${url}`);
-  };
-
   return (
-    <div className="App">
-
-      <h1>Video Generator</h1>
-      <PromptForm onSubmit={handleVideoGenerated} />
-
-      {videoUrl && (
-        <div>
-          <h2>Generated Video</h2>
-          <a href={videoUrl} download="video.mp4">Download Video</a>
-          <video src={videoUrl} controls />
-        </div>
-      )}
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/"
+          element={<WelcomePage />} />
+        <Route path="/login"
+          element={<LoginPage />} />
+        <Route path="/generate"
+          element={<VideoGenPage />} />
+        <Route path="/register"
+          element={<RegisterPage />} />
+        <Route path="/video" element={<VideoDisplayPage />} />
+      </Routes>
+    </Router>
   );
 }
 

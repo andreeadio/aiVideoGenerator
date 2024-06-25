@@ -1,3 +1,5 @@
+//videos created directly with ffmpeg
+
 const ffmpeg = require('fluent-ffmpeg');
 const pathToFfmpeg = require('ffmpeg-static');
 ffmpeg.setFfmpegPath(pathToFfmpeg)
@@ -5,8 +7,6 @@ ffmpeg.setFfmpegPath(pathToFfmpeg)
 const path = require('path');
 const fs = require('fs-extra');
 require('dotenv').config();
-
-
 
 
 const generateVideo = async (req, res) => {

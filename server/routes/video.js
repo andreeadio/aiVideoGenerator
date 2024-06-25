@@ -1,8 +1,8 @@
-const express = require('express')
-const router = express.Router()
-const { generateVideo } = require('../controllers/hfVideoController')
+const express = require('express');
+const router = express.Router();
+const { authenticateToken } = require('../middleware/authMiddleware');
+const { generateVideo } = require('../controllers/videoController');
 
-//http requests here
-router.post('/generate-video', generateVideo)
+router.post('/generate-video', authenticateToken, generateVideo);
 
-module.exports = router
+module.exports = router;

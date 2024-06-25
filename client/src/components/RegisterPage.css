@@ -1,0 +1,44 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #9B59B6 25%, #0d0f63 75%);
+}
+
+.register-card {
+    width: 400px;
+    height: 500px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    background-color: #cfc1ee;
+}
+
+.p-field {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.p-button-primary {
+    width: 100%;
+}
+
+#username,
+#email,
+#password,
+#surname,
+#name {
+    height: 40px;
+}

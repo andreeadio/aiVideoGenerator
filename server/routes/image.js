@@ -1,8 +1,9 @@
-const express = require('express')
-const router = express.Router()
-const { generateImage } = require('../controllers/imageController')
 
-//http requests here
-router.post('/generate-image', generateImage)
+const express = require('express');
+const router = express.Router();
+const { authenticateToken } = require('../middleware/authMiddleware');
+const { generateImage } = require('../controllers/imageController');
 
-module.exports = router
+router.post('/generate-image', authenticateToken, generateImage);
+
+module.exports = router;
