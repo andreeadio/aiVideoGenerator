@@ -1,3 +1,5 @@
+// videoController.js
+
 const ffmpeg = require('fluent-ffmpeg');
 const pathToFfmpeg = require('ffmpeg-static');
 ffmpeg.setFfmpegPath(pathToFfmpeg);
@@ -10,8 +12,20 @@ const Video = require('../models/Video');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+
 const generateVideo = async (req, res) => {
-    const { prompts } = req.body;
+    const { prompts: rawPrompts, duration } = req.body;
+    const audioFile = req.file;
+
+    let prompts;
+    try {
+        prompts = JSON.parse(rawPrompts);
+    } catch (error) {
+        return res.status(400).json({ error: 'Invalid prompts format' });
+    }
+
     const userId = req.user.userId;
     const outputDir = path.join(__dirname, '..', 'output');
     const videoPath = path.join(outputDir, `video-${uuidv4()}.mp4`);
@@ -20,11 +34,20 @@ const generateVideo = async (req, res) => {
     try {
         await fs.ensureDir(outputDir);
 
+        console.log('Prompts:', prompts);
+        console.log('User ID:', userId);
+
         for (let i = 0; i < prompts.length; i++) {
-            const imageRecord = await Image.findOne({ prompt: prompts[i], userId });
+            const prompt = prompts[i];
+            const imageRecord = await Image.findOne({ prompt, userId });
+
             if (!imageRecord) {
-                throw new Error('Image not found in database');
+                console.error(`Image not found in database for prompt: ${prompt}`);
+                throw new Error(`Image not found in database for prompt: ${prompt}`);
             }
+
+            console.log(`Found image for prompt: ${prompt}`);
+
             const base64Data = imageRecord.imageData.replace(/^data:image\/png;base64,/, '');
             const imagePath = path.join(outputDir, `temp-image-${uuidv4()}.png`);
             await fs.writeFile(imagePath, base64Data, 'base64');
@@ -37,7 +60,7 @@ const generateVideo = async (req, res) => {
 
         const videoOptions = {
             fps: 25,
-            loop: 5,
+            loop: duration,
             transition: true,
             transitionDuration: 1,
             videoBitrate: 1024,
@@ -65,7 +88,13 @@ const generateVideo = async (req, res) => {
             },
         };
 
-        videoshow(images, videoOptions)
+        const videoBuilder = videoshow(images, videoOptions);
+
+        if (audioFile) {
+            videoBuilder.audio(audioFile.path);
+        }
+
+        videoBuilder
             .save(videoPath)
             .on('start', (command) => {
                 console.log('ffmpeg process started:', command);

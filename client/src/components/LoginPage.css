@@ -26,6 +26,7 @@ body {
 .p-field {
     margin-bottom: 2rem;
     margin-top: 2rem;
+
 }
 
 .full-width {
@@ -38,10 +39,12 @@ body {
 
 #username {
     height: 40px;
+    border: 1px solid #ccc;
 
 }
 
 #password {
     height: 40px;
+    border: 1px solid #ccc;
 
 }

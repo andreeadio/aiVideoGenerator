@@ -7,6 +7,7 @@ body {
 }
 
 .container {
+
     width: 80%;
     margin: 20px auto;
     background: #fff;
@@ -57,10 +58,17 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 5px;
+
 }
 
+
 .button-group .p-button {
+    margin-top: 5px;
+
     margin-bottom: 5px;
+    padding: 10px 16px;
+
 }
 
 .generated-image {
@@ -73,10 +81,11 @@ body {
 }
 
 .add-scene-button,
+.next-button,
 .generate-video-button {
     background-color: #8E44AD;
     border-color: #823f9e;
-    color: #fff;
+    color: hwb(0 100% 0%);
     width: 100%;
     font-size: 18px;
     padding: 10px;
@@ -110,4 +119,107 @@ body {
     width: 100%;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Panel styling */
+.custom-panel {
+    background-color: #8E44AD;
+    color: hsl(0, 0%, 100%);
+    width: 100%;
+    font-size: 18px;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.custom-panel .p-panel-header {
+    width: 100%;
+    margin-top: 0px;
+    background-color: #8E44AD !important;
+    border: none !important;
+    color: white !important;
+    display: flex;
+    /* align-items: center; */
+    text-align: center;
+}
+
+.custom-panel .p-panel-content {
+    background-color: #ffffff;
+    color: black;
+    padding: 1rem;
+}
+
+.p-panel-content .duration-setting,
+.p-panel-content .audio-upload {
+    margin-bottom: 1rem;
+}
+
+.p-panel-content label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    display: block;
+
+}
+
+
+.duration-audio-container {
+    display: flex;
+    /* justify-content: space-between; */
+    justify-content: center;
+    align-items: center;
+
+}
+
+.duration-setting {
+    flex: 1;
+    margin-right: 70px;
+}
+
+.audio-upload {
+    flex: 1;
+    margin-right: 20px;
+
+}
+
+.duration-setting input,
+.audio-upload .p-fileupload-choose {
+    width: 100%;
+    height: 40px;
+    /* Adjust as needed */
+    font-size: 16px;
+    /* Adjust as needed */
+    padding: 10px;
+    margin-top: 10px;
+
+}
+
+/* Style for the toggle icon */
+.custom-panel .p-panel-header .p-panel-icons .p-panel-toggler {
+    color: white !important;
+}
+
+.duration-setting label {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.duration-setting input {
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    border: 1px solid #ccc;
+}
+
+.audio-upload label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 16px;
+
+}
+
+.audio-upload input {
+    padding: 10px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
 }

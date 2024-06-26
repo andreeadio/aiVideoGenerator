@@ -10,6 +10,7 @@ import LoginPage from "./components/LoginPage";
 import VideoGenPage from "./components/VideoGenPage"
 import RegisterPage from "./components/RegisterPage"
 import VideoDisplayPage from './components/VideoDisplayPage';
+import PromptForm from './components/PromptForm';
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
         <Route path="/register"
           element={<RegisterPage />} />
         <Route path="/video" element={<VideoDisplayPage />} />
+
       </Routes>
     </Router>
   );

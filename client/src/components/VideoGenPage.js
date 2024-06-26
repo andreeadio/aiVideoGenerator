@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PromptForm from './PromptForm';
-
+import { Card } from 'primereact/card'
 
 function VideoGenPage() {
 
@@ -17,7 +17,7 @@ function VideoGenPage() {
     return (
         <div className="App">
 
-            <h1>Video Generator</h1>
+
             <PromptForm onSubmit={handleVideoGenerated} />
 
             {videoUrl && (
