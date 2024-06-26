@@ -11,6 +11,7 @@ const app = express();
 const videoRouter = require('./routes/video');
 const imageRouter = require('./routes/image');
 const authRouter = require('./routes/user');
+const audioRouter = require('./routes/audio');
 const { authenticateToken } = require('./middleware/authMiddleware');
 
 // Connect to MongoDB
@@ -36,8 +37,16 @@ app.use('/api/auth', authRouter);
 // Protected Routes
 app.use('/api', authenticateToken, videoRouter);
 app.use('/api', authenticateToken, imageRouter);
+app.use('/api', authenticateToken, audioRouter);
+
 
 app.use('/output', express.static(path.join(__dirname, 'output')));
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => {

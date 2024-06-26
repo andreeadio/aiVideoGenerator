@@ -21,13 +21,38 @@ function PromptForm({ onSubmit }) {
     //*
     const [duration, setDuration] = useState(5); // Default duration
     const [audioFile, setAudioFile] = useState(null);
+    const [audioId, setAudioId] = useState(null);
 
-    const handleAudioUpload = (e) => {
-
-        const file = e.files[0]
+    const handleAudioUpload = async (event) => {
+        const file = event.files[0];
         setAudioFile(file);
-        console.log('Audio uploaded: ', file)
+        console.log('Audio uploaded:', file); // Ensure this message is logged
+
+        // Upload audio file to server and get audioId
+        try {
+            const token = localStorage.getItem('token');
+            const formData = new FormData();
+            formData.append('audio', file);
+
+            const response = await axios.post('http://localhost:8080/api/upload-audio', formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            setAudioId(response.data.audioId);
+            console.log('Audio ID:', response.data.audioId);
+        } catch (error) {
+            console.error('Error uploading audio:', error);
+        }
     };
+    // const handleAudioUpload = (e) => {
+
+    //     const file = e.files[0]
+    //     setAudioFile(file);
+    //     console.log('Audio uploaded: ', file)
+    // };
     //*
     const navigate = useNavigate();
 
@@ -92,9 +117,7 @@ function PromptForm({ onSubmit }) {
             const formData = new FormData();
             formData.append('prompts', JSON.stringify(prompts));
             formData.append('duration', duration);
-            if (audioFile) {
-                formData.append('audio', audioFile);
-            }
+            formData.append('audioId', audioId); // Send the audio ID
 
             const response = await axios.post('http://localhost:8080/api/generate-video', formData, {
                 headers: {
@@ -111,6 +134,33 @@ function PromptForm({ onSubmit }) {
             setVideoLoading(false);
         }
     };
+    // const handleGenerateVideo = async () => {
+    //     setVideoLoading(true);
+
+    //     try {
+    //         const token = localStorage.getItem('token');
+    //         const formData = new FormData();
+    //         formData.append('prompts', JSON.stringify(prompts));
+    //         formData.append('duration', duration);
+    //         if (audioFile) {
+    //             formData.append('audio', audioFile);
+    //         }
+
+    //         const response = await axios.post('http://localhost:8080/api/generate-video', formData, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //                 'Content-Type': 'multipart/form-data',
+    //             },
+    //         });
+    //         console.log('Response from server:', response.data);
+    //         onSubmit(response.data.videoUrl);
+    //         navigate('/video', { state: { videoUrl: `http://localhost:8080${response.data.videoUrl}` } });
+    //     } catch (error) {
+    //         console.error('Error generating video:', error);
+    //     } finally {
+    //         setVideoLoading(false);
+    //     }
+    // };
 
 
     return (
