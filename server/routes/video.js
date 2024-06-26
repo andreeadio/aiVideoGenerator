@@ -3,9 +3,8 @@ const router = express.Router();
 const { authenticateToken } = require('../middleware/authMiddleware');
 const { generateVideo } = require('../controllers/videoController');
 
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const upload = require('../middleware/uploadMiddleware');
 
-router.post('/generate-video', authenticateToken, upload.single('audio'), generateVideo);
+router.post('/generate-video', authenticateToken, upload, generateVideo);
 
 module.exports = router;

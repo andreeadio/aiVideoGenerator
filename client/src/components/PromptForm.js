@@ -23,7 +23,10 @@ function PromptForm({ onSubmit }) {
     const [audioFile, setAudioFile] = useState(null);
 
     const handleAudioUpload = (e) => {
-        setAudioFile(e.files[0]);
+
+        const file = e.files[0]
+        setAudioFile(file);
+        console.log('Audio uploaded: ', file)
     };
     //*
     const navigate = useNavigate();
@@ -158,8 +161,7 @@ function PromptForm({ onSubmit }) {
                     <Panel header="Scene Settings" className="custom-panel" toggleable>
                         <div className="duration-audio-container">
 
-                            <div className="duration-setting {
-">
+                            <div className="duration-setting">
                                 <label htmlFor="duration">Duration for each scene (seconds):</label>
                                 <InputNumber
                                     id="duration"
@@ -173,9 +175,15 @@ function PromptForm({ onSubmit }) {
 
                             <div className="audio-upload">
                                 <label htmlFor="audio">Choose music or voiceover:</label>
-
-                                <FileUpload mode="basic" accept="audio/*" maxFileSize={10000000} customUpload uploadHandler={handleAudioUpload} className="full-width"
+                                <FileUpload
+                                    mode="basic"
+                                    accept="audio/*"
+                                    maxFileSize={10000000}
+                                    customUpload
+                                    uploadHandler={handleAudioUpload}
+                                    className="full-width"
                                 />
+
                             </div>
                         </div>
 
