@@ -37,6 +37,7 @@ function VideoDisplayPage() {
                 <p>Your video has been successfully generated and is ready for viewing and download.</p>
             </Card>
             <Card className="video-card">
+
                 <video src={videoUrl} controls />
                 <div className="download-button">
                     <Button label="Download Video" icon="pi pi-download" onClick={() => handleDownloadVideo(videoUrl)} className="p-button-primary" />
