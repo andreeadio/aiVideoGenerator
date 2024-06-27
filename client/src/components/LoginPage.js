@@ -21,9 +21,9 @@ const LoginPage = () => {
                 password,
             });
 
-            const { token } = response.data;
+            const { token } = response.data.token;
             localStorage.setItem('token', token);
-
+            localStorage.setItem('username', response.data.username);
             setError('');
             navigate('/generate');
         } catch (error) {
@@ -31,6 +31,7 @@ const LoginPage = () => {
             console.error('Error logging in:', error)
         }
     }
+
 
     return (
 

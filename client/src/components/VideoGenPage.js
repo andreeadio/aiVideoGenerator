@@ -15,7 +15,7 @@ function VideoGenPage() {
     };
 
     return (
-        <div className="App">
+        <div >
 
 
             <PromptForm onSubmit={handleVideoGenerated} />

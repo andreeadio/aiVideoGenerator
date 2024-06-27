@@ -27,7 +27,12 @@ const RegisterPage = () => {
                 name,
                 surname,
             });
+            const { token } = response.data.token;
+            localStorage.setItem('token', token);
+            localStorage.setItem('username', response.data.username);
+
             setSuccess('User registered successfully!');
+
             setError('');
             setTimeout(() => {
                 navigate('/generate');

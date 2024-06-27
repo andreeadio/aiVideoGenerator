@@ -1,0 +1,33 @@
+.topbar {
+    background-color: #dbcef7;
+    border: none;
+    box-shadow: 0 3px 6px rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    /* Change to space-between */
+    align-items: center;
+    padding: 10px;
+}
+
+.logo {
+    height: 60px;
+    /* Adjust as needed */
+}
+
+.username {
+    color: grey;
+    font-weight: bold;
+    margin-left: 10px;
+    margin-right: 20px;
+}
+
+.p-button-secondary {
+    background-color: grey;
+    border-color: grey;
+    padding: 10px 16px;
+}
+
+.p-button-secondary:hover {
+    background-color: lightslategrey;
+    border-color: grey;
+}

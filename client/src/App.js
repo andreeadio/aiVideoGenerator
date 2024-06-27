@@ -1,33 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
 
-
-import React, { useState } from 'react';
-
-import { BrowserRouter as Router, Routes, Route, Switch } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import WelcomePage from "./components/WelcomePage";
 import LoginPage from "./components/LoginPage";
-import VideoGenPage from "./components/VideoGenPage"
-import RegisterPage from "./components/RegisterPage"
+import PromptForm from "./components/PromptForm";
+import RegisterPage from "./components/RegisterPage";
 import VideoDisplayPage from './components/VideoDisplayPage';
-import PromptForm from './components/PromptForm';
+import TopBar from './components/TopBar';
+import './App.css';
 
-function App() {
+const AppContent = () => {
+  const location = useLocation();
+  const hideTopBarPaths = ['/', '/login', '/register']; // Add paths where you don't want to show the TopBar
 
   return (
-    <Router>
+    <div >
+      {!hideTopBarPaths.includes(location.pathname) && <TopBar />}
       <Routes>
-        <Route path="/"
-          element={<WelcomePage />} />
-        <Route path="/login"
-          element={<LoginPage />} />
-        <Route path="/generate"
-          element={<VideoGenPage />} />
-        <Route path="/register"
-          element={<RegisterPage />} />
+        <Route path="/" element={<WelcomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/generate" element={<PromptForm />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/video" element={<VideoDisplayPage />} />
-
       </Routes>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
