@@ -35,7 +35,7 @@ const LoginPage = () => {
     return (
 
         <div className="login-container">
-
+            <h1>Welcome back! Time for a new creation!</h1>
             <Card title="Login" className="login-card">
                 <div className="p-fluid">
                     <div className="p-field">

@@ -5,9 +5,16 @@ body {
     padding: 0;
 }
 
+h1 {
+    color: white;
+    margin-top: 10px;
+    margin-bottom: 60px;
+}
+
 .register-container {
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
     height: 100vh;
     background: linear-gradient(135deg, #9B59B6 25%, #0d0f63 75%);

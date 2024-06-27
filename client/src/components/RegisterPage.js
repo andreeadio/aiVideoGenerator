@@ -41,6 +41,9 @@ const RegisterPage = () => {
 
     return (
         <div className="register-container">
+
+            <h1>Welcome new user, hope you enjoy the process!</h1>
+
             <Card title="Register" className="register-card">
                 {error && <p className="error-message">{error}</p>}
                 {success && <p className="success-message">{success}</p>}
