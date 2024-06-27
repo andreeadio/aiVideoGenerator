@@ -129,6 +129,7 @@ const generateVideo = async (req, res) => {
 
         videoBuilder.audio(processedAudioPath);
 
+        // Add watermark during the initial processing
         videoBuilder
             .save(videoPath)
             .on('start', (command) => {
@@ -143,13 +144,37 @@ const generateVideo = async (req, res) => {
                 res.status(500).send('Error generating video');
             })
             .on('end', async (output) => {
-                console.log('Video created in:', output);
+                console.log('Initial video created in:', output);
+
+                // Add watermark to the video
+                await new Promise((resolve, reject) => {
+                    ffmpeg(output)
+                        .outputOptions([
+                            '-vf', 'drawtext=text=\'AI generated content\':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=10:y=H-th-10',
+                            '-codec:a', 'copy'
+                        ])
+                        .save(videoPath)
+                        .on('start', (command) => {
+                            console.log('ffmpeg process started for watermark:', command);
+                        })
+                        .on('error', (err, stdout, stderr) => {
+                            console.error('Error:', err);
+                            console.error('ffmpeg stderr:', stderr);
+                            reject(err);
+                        })
+                        .on('end', (output) => {
+                            console.log('Final video with watermark created in:', output);
+                            resolve(output);
+                        });
+                });
+
                 for (const imagePath of tempImages) {
                     await fs.remove(imagePath);
                 }
-                if (processedAudioPath) {
+                if (processedAudioPath !== audioFilePath) {
                     await fs.remove(processedAudioPath);
                 }
+                await fs.remove(audioFilePath);
 
                 const video = new Video({
                     videoUrl: `/output/${path.basename(videoPath)}`,
@@ -160,6 +185,7 @@ const generateVideo = async (req, res) => {
 
                 res.json({ videoUrl: video.videoUrl });
             });
+
     } catch (error) {
         console.error('Error generating video:', error);
         for (const imagePath of tempImages) {
