@@ -6,13 +6,30 @@ const path = require('path');
 const fs = require('fs-extra');
 const videoshow = require('videoshow');
 const Image = require('../models/Image');
-const Audio = require('../models/Audio'); // Import the Audio model
+const Audio = require('../models/Audio');
 const Video = require('../models/Video');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 
+const getAudioDuration = (filePath) => {
+    return new Promise((resolve, reject) => {
+        ffmpeg.ffprobe(filePath, (err, metadata) => {
+            if (err) {
+                return reject(err);
+            }
+            const duration = metadata.format.duration;
+            resolve(duration);
+        });
+    });
+};
+
 const generateVideo = async (req, res) => {
-    const { prompts: rawPrompts, duration, audioId } = req.body; // Add audioId to the request body
+    const { prompts: rawPrompts, duration, audioId } = req.body;
+
+    if (!audioId) {
+        console.error('Audio ID is missing');
+        return res.status(400).json({ error: 'Audio ID is required' });
+    }
 
     // Parse prompts JSON
     let prompts;
@@ -70,19 +87,47 @@ const generateVideo = async (req, res) => {
 
         const videoBuilder = videoshow(images, videoOptions);
 
-        if (audioId) {
-            const audioRecord = await Audio.findById(audioId);
+        const audioRecord = await Audio.findById(audioId);
 
-            if (!audioRecord) {
-                console.error('Audio file not found in database');
-                throw new Error('Audio file not found in database');
-            }
-
-            const audioFilePath = path.join(outputDir, `temp-audio-${uuidv4()}.mp3`);
-            await fs.writeFile(audioFilePath, audioRecord.data);
-
-            videoBuilder.audio(audioFilePath);
+        if (!audioRecord) {
+            console.error('Audio file not found in database');
+            throw new Error('Audio file not found in database');
         }
+
+        const audioFilePath = path.join(outputDir, `temp-audio-${uuidv4()}.mp3`);
+        await fs.writeFile(audioFilePath, audioRecord.data);
+
+        const audioDuration = await getAudioDuration(audioFilePath);
+        const videoDuration = prompts.length * duration;
+
+        let processedAudioPath = audioFilePath;
+
+        if (audioDuration < videoDuration) {
+            // Loop the audio if it's shorter than the video duration
+            const loopedAudioPath = path.join(outputDir, `looped-audio-${uuidv4()}.mp3`);
+            await new Promise((resolve, reject) => {
+                ffmpeg(audioFilePath)
+                    .inputOptions(['-stream_loop', '-1']) // Loop the audio
+                    .duration(videoDuration) // Set the duration to match the video
+                    .save(loopedAudioPath)
+                    .on('end', () => resolve(loopedAudioPath))
+                    .on('error', (err) => reject(err));
+            });
+            processedAudioPath = loopedAudioPath;
+        } else if (audioDuration > videoDuration) {
+            // Truncate the audio if it's longer than the video duration
+            const truncatedAudioPath = path.join(outputDir, `truncated-audio-${uuidv4()}.mp3`);
+            await new Promise((resolve, reject) => {
+                ffmpeg(audioFilePath)
+                    .setDuration(videoDuration) // Truncate the audio to match the video duration
+                    .save(truncatedAudioPath)
+                    .on('end', () => resolve(truncatedAudioPath))
+                    .on('error', (err) => reject(err));
+            });
+            processedAudioPath = truncatedAudioPath;
+        }
+
+        videoBuilder.audio(processedAudioPath);
 
         videoBuilder
             .save(videoPath)
@@ -102,9 +147,8 @@ const generateVideo = async (req, res) => {
                 for (const imagePath of tempImages) {
                     await fs.remove(imagePath);
                 }
-                if (audioId) {
-                    const audioFilePath = path.join(outputDir, `temp-audio-${uuidv4()}.mp3`);
-                    await fs.remove(audioFilePath);
+                if (processedAudioPath) {
+                    await fs.remove(processedAudioPath);
                 }
 
                 const video = new Video({
@@ -120,10 +164,6 @@ const generateVideo = async (req, res) => {
         console.error('Error generating video:', error);
         for (const imagePath of tempImages) {
             await fs.remove(imagePath);
-        }
-        if (audioId) {
-            const audioFilePath = path.join(outputDir, `temp-audio-${uuidv4()}.mp3`);
-            await fs.remove(audioFilePath);
         }
         res.status(500).json({ error: 'Internal server error. Please try again later.' });
     }
