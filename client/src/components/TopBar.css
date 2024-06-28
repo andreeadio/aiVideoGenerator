@@ -33,3 +33,32 @@
     background-color: lightslategrey;
     border-color: grey;
 }
+
+.navigation-links,
+.user-section {
+    display: flex;
+    align-items: center;
+}
+
+.nav-link {
+    color: black;
+    margin: 0 10px;
+    font-weight: bold;
+    /* Make link text white */
+
+    /* Button-like background */
+    padding: 6px 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    /* Remove underline */
+    display: inline-block;
+
+    /* Smooth transition for hover effect */
+}
+
+.nav-link:hover,
+.logout-link:hover {
+    color: grey;
+
+    /* Darker shade on hover */
+}
