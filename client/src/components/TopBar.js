@@ -5,12 +5,19 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom'; // Import Link
 
 import './TopBar.css';
+// import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 const TopBar = () => {
-
     const navigate = useNavigate();
-    const username = localStorage.getItem('username'); // Retrieve the username
+    const token = localStorage.getItem('token');
+    let username = '';
 
+    // Decode the JWT token to get the username
+    if (token) {
+        const decoded = jwtDecode(token);
+        username = decoded.username; // Assuming the payload has a 'username' field
+    }
     const handleLogout = () => {
         localStorage.removeItem('token');
         //localStorage.removeItem('username'); // Remove the username on logout

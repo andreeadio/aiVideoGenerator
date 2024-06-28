@@ -17,10 +17,17 @@ const registerUser = async (req, res) => {
 
         await newUser.save();
 
-        // const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        // // const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.status(201).json({ message: 'User registered successfully' });
-        // res.json({ token, username });
+        // res.status(201).json({ message: 'User registered successfully' });
+        // // res.json({ token, username });
+        // const token = jwt.sign({ userId: newUser._id, username: newUser.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.status(201).json({
+            message: 'User registered successfully',
+            token, // Send the token back to the client
+            username // Include the username in the response for immediate use
+        });
 
     } catch (error) {
         console.error('Error registering user:', error);
@@ -42,9 +49,16 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ error: 'Invalid username or password' });
         }
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        // const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.json({ token });
+        // res.json({ token });
+        const token = jwt.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.json({
+            token,
+            username // Include the username in the response for client-side usage
+        });
+
     } catch (error) {
         console.error('Error logging in user:', error);
         res.status(500).json({ error: 'Internal server error' });

@@ -59,6 +59,16 @@ body {
     /* Height of the video card */
 }
 
+.video-card .p-card-title {
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.video-list .p-card-title {
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
 .download-button {
     margin-top: 20px;
     display: flex;
