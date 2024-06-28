@@ -16,7 +16,7 @@ const WelcomePage = () => {
 
     return (
         <div className="app-container">
-            <div className="background-animation"></div>
+            {/* <div className="background-animation"></div> */}
             <div className="content">
                 <h1>Welcome to the Video Generator</h1>
                 <p>Create videos with ease using AI generation.</p>

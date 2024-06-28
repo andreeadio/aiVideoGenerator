@@ -10,8 +10,8 @@ const TopBar = () => {
     const username = localStorage.getItem('username'); // Retrieve the username
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('username'); // Remove the username on logout
+        // localStorage.removeItem('token');
+        // localStorage.removeItem('username'); // Remove the username on logout
         navigate('/login');
     };
 
@@ -21,9 +21,9 @@ const TopBar = () => {
                 <img src="/logo.webp" alt="Logo" className="logo" />
             </div>
             <div className="p-d-flex p-ai-center">
-                <Avatar icon="pi pi-user" className="p-mr-2" size="large" />
+                <Avatar icon="pi pi-user" className="p-mr-2" />
                 <span className="username">{username}</span>
-                <Button label="Logout" icon="pi pi-sign-out" onClick={handleLogout} className="p-button-secondary" />
+                <Button label=" Log out" icon="pi pi-sign-out" onClick={handleLogout} className="p-button-secondary" />
             </div>
         </div>
     );

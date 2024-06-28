@@ -17,9 +17,9 @@ const registerUser = async (req, res) => {
 
         await newUser.save();
 
-        const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        // const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.status(201).json({ message: 'User registered successfully', token, username });
+        res.status(201).json({ message: 'User registered successfully' });
         // res.json({ token, username });
 
     } catch (error) {
@@ -44,7 +44,7 @@ const loginUser = async (req, res) => {
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.json({ token, username });
+        res.json({ token });
     } catch (error) {
         console.error('Error logging in user:', error);
         res.status(500).json({ error: 'Internal server error' });

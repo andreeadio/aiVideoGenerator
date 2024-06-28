@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PromptForm from './PromptForm';
 import { Card } from 'primereact/card'
+import './VideoGenPage.css';
 
 function VideoGenPage() {
 
@@ -15,9 +16,9 @@ function VideoGenPage() {
     };
 
     return (
-        <div >
+        <div className='display-video-class' >
 
-
+            <h3>Create your video by generating images from prompts and adding video settings</h3>
             <PromptForm onSubmit={handleVideoGenerated} />
 
             {videoUrl && (

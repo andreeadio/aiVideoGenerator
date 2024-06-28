@@ -21,11 +21,11 @@ const LoginPage = () => {
                 password,
             });
 
-            const { token } = response.data.token;
+            const { token } = response.data;
             localStorage.setItem('token', token);
-            localStorage.setItem('username', response.data.username);
+            // localStorage.setItem('username', response.data.username);
             setError('');
-            navigate('/generate');
+            navigate('/generate-images');
         } catch (error) {
             setError('Invalid username or password. Please try again.');
             console.error('Error logging in:', error)

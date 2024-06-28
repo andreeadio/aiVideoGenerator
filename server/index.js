@@ -12,6 +12,8 @@ const videoRouter = require('./routes/video');
 const imageRouter = require('./routes/image');
 const authRouter = require('./routes/user');
 const audioRouter = require('./routes/audio');
+const descriptionRouter = require('./routes/description');
+
 const { authenticateToken } = require('./middleware/authMiddleware');
 
 // Connect to MongoDB
@@ -38,6 +40,8 @@ app.use('/api/auth', authRouter);
 app.use('/api', authenticateToken, videoRouter);
 app.use('/api', authenticateToken, imageRouter);
 app.use('/api', authenticateToken, audioRouter);
+app.use('/api', authenticateToken, descriptionRoutes);
+
 
 
 app.use('/output', express.static(path.join(__dirname, 'output')));

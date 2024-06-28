@@ -8,6 +8,7 @@ import RegisterPage from "./components/RegisterPage";
 import VideoDisplayPage from './components/VideoDisplayPage';
 import TopBar from './components/TopBar';
 import './App.css';
+import VideoGenPage from './components/VideoGenPage';
 
 const AppContent = () => {
   const location = useLocation();
@@ -19,9 +20,11 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/generate" element={<PromptForm />} />
+        <Route path="/generate-images" element={<VideoGenPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/video" element={<VideoDisplayPage />} />
+
+
       </Routes>
     </div>
   );

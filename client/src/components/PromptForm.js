@@ -8,6 +8,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import { FileUpload } from 'primereact/fileupload';
 import { useNavigate } from 'react-router-dom';
 import { Panel } from 'primereact/panel';
+import { Dialog } from 'primereact/dialog'
 
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
@@ -18,10 +19,45 @@ function PromptForm({ onSubmit }) {
     const [videoLoading, setVideoLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    //*
+    //scenes
+    const [numScenes, setNumScenes] = useState(1);
+    const [topic, setTopic] = useState('');
+    const [descriptionsLoading, setDescriptionsLoading] = useState(false);
+
+    //*audio    
+    const [dialogVisible, setDialogVisible] = useState(false);
     const [duration, setDuration] = useState(5); // Default duration
     const [audioFile, setAudioFile] = useState(null);
     const [audioId, setAudioId] = useState(null);
+
+    const handleGenerateDescriptions = async () => {
+        setDescriptionsLoading(true);
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.post(
+                'http://localhost:8080/api/generate-descriptions',
+                { numScenes, topic },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            setPrompts(response.data.descriptions);
+        } catch (error) {
+            console.error('Error generating descriptions:', error);
+        } finally {
+            setDescriptionsLoading(false);
+        }
+    };
+    const dialogFooter = (
+        <div>
+            <Button label="Generate" icon="pi pi-check" onClick={handleGenerateDescriptions} autoFocus />
+        </div>
+    );
+
+
 
     const handleAudioUpload = async (event) => {
         const file = event.files[0];
@@ -47,13 +83,7 @@ function PromptForm({ onSubmit }) {
             console.error('Error uploading audio:', error);
         }
     };
-    // const handleAudioUpload = (e) => {
 
-    //     const file = e.files[0]
-    //     setAudioFile(file);
-    //     console.log('Audio uploaded: ', file)
-    // };
-    //*
     const navigate = useNavigate();
 
     const handleChange = (e, index) => {
@@ -134,40 +164,27 @@ function PromptForm({ onSubmit }) {
             setVideoLoading(false);
         }
     };
-    // const handleGenerateVideo = async () => {
-    //     setVideoLoading(true);
-
-    //     try {
-    //         const token = localStorage.getItem('token');
-    //         const formData = new FormData();
-    //         formData.append('prompts', JSON.stringify(prompts));
-    //         formData.append('duration', duration);
-    //         if (audioFile) {
-    //             formData.append('audio', audioFile);
-    //         }
-
-    //         const response = await axios.post('http://localhost:8080/api/generate-video', formData, {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //                 'Content-Type': 'multipart/form-data',
-    //             },
-    //         });
-    //         console.log('Response from server:', response.data);
-    //         onSubmit(response.data.videoUrl);
-    //         navigate('/video', { state: { videoUrl: `http://localhost:8080${response.data.videoUrl}` } });
-    //     } catch (error) {
-    //         console.error('Error generating video:', error);
-    //     } finally {
-    //         setVideoLoading(false);
-    //     }
-    // };
-
 
     return (
         <div>
 
-
             <div className="container">
+
+
+                <Button label="Generate Scene Prompts with AI" icon="pi pi-external-link" onClick={() => setDialogVisible(true)} />
+                <Dialog header="Generate Scene Descriptions" visible={dialogVisible} style={{ width: '50vw' }} footer={dialogFooter} onHide={() => setDialogVisible(false)}>
+                    <div>
+                        <label htmlFor="numScenes">Number of Scenes:</label>
+                        <InputNumber id="numScenes" value={numScenes} onValueChange={(e) => setNumScenes(e.value)} />
+                    </div>
+                    <div>
+                        <label htmlFor="topic">Topic:</label>
+                        <InputTextarea id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} autoResize />
+                    </div>
+                    {descriptionsLoading && <ProgressSpinner />}
+                </Dialog>
+
+
                 <form onSubmit={(e) => e.preventDefault()} className="form">
                     {prompts.map((prompt, index) => (
                         <div key={index} className="prompt-container">

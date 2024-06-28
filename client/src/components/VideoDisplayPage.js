@@ -33,9 +33,9 @@ function VideoDisplayPage() {
 
     return (
         <div className="video-display-container">
-            <Card title="Video Ready!" className="info-card">
-                <p>Your video has been successfully generated and is ready for viewing and download.</p>
-            </Card>
+            <h3>Video Ready!</h3>
+            <p>Your video has been successfully generated and is ready for viewing and download.</p>
+
             <Card className="video-card">
 
                 <video src={videoUrl} controls />

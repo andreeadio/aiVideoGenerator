@@ -87,22 +87,17 @@
 
 // module.exports = { generateImage };
 
-
 const axios = require('axios');
 const Image = require('../models/Image');
 require('dotenv').config();
-
 const HF_API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0";
 const HF_API_KEY = process.env.HF_API_KEY;
 
 const generateImage = async (req, res) => {
     const { prompt } = req.body;
     const userId = req.user.userId;
-
     try {
         console.log(`Generating image for prompt: ${prompt}`);
-
-        // Generate the new image from the API
         const response = await axios.post(HF_API_URL, {
             inputs: prompt,
         }, {
@@ -112,12 +107,10 @@ const generateImage = async (req, res) => {
             },
             responseType: 'arraybuffer',
         });
-
         if (response.status !== 200) {
             console.error(`Error from API for prompt: `, response.data);
             return res.status(response.status).json({ error: 'Error generating image from API' });
         }
-
         const buffer = Buffer.from(response.data, 'binary');
         const base64Image = buffer.toString('base64');
         const imageUrl = `data:image/png;base64,${base64Image}`;
