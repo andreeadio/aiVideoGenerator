@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
@@ -6,7 +7,30 @@ import './VideoDisplayPage.css';
 
 function VideoDisplayPage() {
     const location = useLocation();
-    const { videoUrl } = location.state;
+    const initialVideoUrl = location.state ? location.state.videoUrl : '';
+    const [videoUrl, setVideoUrl] = useState(initialVideoUrl);
+    const [videos, setVideos] = useState([]);
+
+    useEffect(() => {
+        const fetchVideos = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/api/videos', {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                setVideos(response.data);
+                // Optionally set the first video as the default if no initial video URL was provided
+                if (!initialVideoUrl && response.data.length > 0) {
+                    setVideoUrl(`http://localhost:8080${response.data[0].videoUrl}`);
+                }
+            } catch (error) {
+                console.error('Error fetching videos:', error);
+            }
+        };
+
+        fetchVideos();
+    }, [initialVideoUrl]);
 
     const handleDownloadVideo = async (url) => {
         try {
@@ -33,16 +57,24 @@ function VideoDisplayPage() {
 
     return (
         <div className="video-display-container">
-            <h3>Video Ready!</h3>
-            <p>Your video has been successfully generated and is ready for viewing and download.</p>
-
-            <Card className="video-card">
-
-                <video src={videoUrl} controls />
+            <Card title="Preview" className="video-card">
+                <video src={videoUrl} controls style={{ width: '100%' }} />
                 <div className="download-button">
                     <Button label="Download Video" icon="pi pi-download" onClick={() => handleDownloadVideo(videoUrl)} className="p-button-primary" />
                 </div>
             </Card>
+
+            <Card title="Video List" className="video-list">
+                {videos.map(video => (
+                    <Button
+                        key={video._id}
+                        label={video.videoUrl.split('/').pop()}
+                        onClick={() => setVideoUrl(`http://localhost:8080${video.videoUrl}`)}
+                        className="video-list-item"
+                    />
+                ))}
+            </Card>
+
         </div>
     );
 }

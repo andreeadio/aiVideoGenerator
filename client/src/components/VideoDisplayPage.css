@@ -1,48 +1,104 @@
 body {
     background: linear-gradient(135deg, #9B59B6 25%, #0d0f63 75%);
     margin: 0;
-    font-family: Arial, sans-serif;
-    overflow-y: scroll;
-
-    margin: 0;
-    padding: 0;
+    font-family: 'Arial', sans-serif;
+    overflow-x: hidden;
+    /* Hide horizontal scroll */
+    overflow-y: auto;
+    /* Allow vertical scroll */
 }
-
 
 .video-display-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #9B59B6 25%, #0d0f63 75%);
-    padding: 10px;
+    flex-direction: row;
+    /* Horizontal layout */
+    align-items: start;
+    /* Align items to the start of the container */
+    justify-content: space-around;
+    /* Distribute space evenly around the items */
+    min-height: 100vh;
+    /* Minimum height to fill the viewport */
+    padding: 20px;
+    /* Padding around the container */
+    box-sizing: border-box;
+    /* Include padding in width/height calculations */
 }
 
-
-
-.video-card {
-    width: 500px;
+.video-list {
+    flex: 2;
+    /* Take up 1 part of the container */
     background: #fff;
     border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    /* More pronounced shadow for depth */
+    overflow-y: auto;
+    /* Allow scrolling */
+    padding: 20px;
+    margin-right: 20px;
+    /* Space between list and preview */
+    max-width: 600px;
+    /* Maximum width of the list */
+    height: 80vh;
+    /* Height of the video list */
+}
+
+.video-card {
+    flex: 2;
+    /* Take up 2 parts of the container */
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 20px;
-    margin-bottom: 10px;
+    max-width: 600px;
+    /* Maximum width of the preview card */
+    height: 80vh;
+    /* Height of the video card */
 }
 
 .download-button {
     margin-top: 20px;
-    width: 100%;
     display: flex;
     justify-content: center;
+    width: 100%;
+    /* Button stretches to container width */
 }
 
 video {
     width: 100%;
-    height: auto;
+    /* Video fills the width of its container */
+    max-height: 60vh;
+    /* Maximum video height to maintain aspect ratio */
     border-radius: 10px;
+    /* Rounded corners for the video */
+}
+
+.video-list-item {
+    width: 100%;
+    /* Full width buttons */
+    text-align: center;
+    /* Center-align text on buttons */
+    margin-bottom: 10px;
+    /* Space between buttons */
+    font-size: 16px;
+    /* Larger font size for readability */
+    padding: 10px;
+    /* Padding inside buttons */
+    border: none;
+    /* Remove borders */
+    background-color: #3b82f6;
+    /* Light grey background for buttons */
+    cursor: pointer;
+    /* Cursor indicates clickable items */
+    transition: background-color 0.3s;
+    /* Smooth transition for hover effect */
+
+    /* Hover state for list items */
+    &:hover {
+        background-color: #5c9bff;
+        /* Darker background on hover */
+    }
 }
