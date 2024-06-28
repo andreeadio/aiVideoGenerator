@@ -9,6 +9,7 @@ import { FileUpload } from 'primereact/fileupload';
 import { useNavigate } from 'react-router-dom';
 import { Panel } from 'primereact/panel';
 import { Dialog } from 'primereact/dialog'
+import { Card } from 'primereact/card'
 
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
@@ -56,7 +57,7 @@ function PromptForm({ onSubmit }) {
 
     const dialogFooter = (
         <div>
-            <Button label="Generate" icon="pi pi-check" onClick={handleGenerateDescriptions} autoFocus />
+            <Button label="Generate" icon="pi pi-sparkles" onClick={handleGenerateDescriptions} autoFocus />
         </div>
     );
 
@@ -173,16 +174,21 @@ function PromptForm({ onSubmit }) {
 
             <div className="container">
 
-
-                <Button label="Generate Scene Prompts with AI" icon="pi pi-external-link" onClick={() => setDialogVisible(true)} />
+                <Button label="AI Scenes" icon="pi pi-sparkles" onClick={() => setDialogVisible(true)} className='p-button-help' />
                 <Dialog header="Generate Scene Descriptions" visible={dialogVisible} style={{ width: '50vw' }} footer={dialogFooter} onHide={() => setDialogVisible(false)}>
-                    <div>
-                        <label htmlFor="numScenes">Number of Scenes:</label>
-                        <InputNumber id="numScenes" value={numScenes} onValueChange={(e) => setNumScenes(e.value)} />
-                    </div>
-                    <div>
-                        <label htmlFor="topic">Topic:</label>
-                        <InputTextarea id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} autoResize />
+                    <div className='dialog-content'>
+                        <div className="p-fluid">
+                            <div className="p-field">
+                                <label htmlFor="numScenes">Number of Scenes:</label>
+                                <InputNumber id="numScenes" value={numScenes} onValueChange={(e) => setNumScenes(e.value)} />
+                            </div>
+                        </div>
+                        <div className="p-fluid">
+                            <div className="p-field">
+                                <label htmlFor="topic">Topic:</label>
+                                <InputTextarea id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} autoResize />
+                            </div>
+                        </div>
                     </div>
                     {descriptionsLoading && <ProgressSpinner />}
                 </Dialog>

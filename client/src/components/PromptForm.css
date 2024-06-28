@@ -71,6 +71,16 @@ body {
 
 }
 
+.p-button-help {
+    padding: 10px 16px;
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    margin-bottom: 10px;
+
+    font-size: 18px;
+    border-radius: 5px;
+}
+
 .generated-image {
     width: 100%;
     height: auto;
@@ -91,7 +101,7 @@ body {
     padding: 10px;
     margin-top: 10px;
     border-radius: 5px;
-    transition: background-color 0.3s;
+
 }
 
 .add-scene-button:hover,
@@ -223,3 +233,98 @@ body {
     border-radius: 3px;
     border: 1px solid #ccc;
 }
+
+
+.p-dialog .p-dialog-content {
+    background-color: white;
+    /* Light grey background for the content area */
+    color: gray;
+    font-weight: bold;
+    /* Dark grey text for readability */
+    border-radius: 0px;
+    /* Rounded corners */
+    padding: 20px;
+    /* Adds padding inside the dialog content area for top and bottom */
+    padding-right: 30px;
+    /* Additional right padding */
+    padding-left: 30px;
+}
+
+/* Header styling */
+.p-dialog .p-dialog-header {
+    background-color: #8E44AD;
+    /* Purple background for the header */
+    color: white;
+    /* White text for the header */
+    font-size: 1.25rem;
+    /* Larger font size for the header */
+    border-top-left-radius: 6px;
+    /* Rounded top-left corner */
+    border-top-right-radius: 6px;
+    /* Rounded top-right corner */
+    height: 50px;
+    padding: 10px;
+    /* Adds padding inside the dialog content area for top and bottom */
+    padding-left: 20px;
+    /* Additional right padding */
+
+}
+
+
+
+/* Button styling within the dialog */
+.p-dialog .p-button {
+    margin: 0.5em;
+    /* Spacing around buttons */
+    border: none;
+    /* No borders for a cleaner look */
+    background-color: #805ad5;
+    /* Purple shade for buttons */
+    color: white;
+    /* White text for buttons */
+    padding: 10px 16px;
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    margin-bottom: 10px;
+
+    font-size: 18px;
+    border-radius: 5px;
+}
+
+.p-dialog .dialog-content {
+    background-color: white;
+}
+
+.p-dialog .p-button:hover {
+    background-color: #805ad5;
+    /* Slightly darker purple on hover */
+}
+
+/* Input styling within the dialog */
+.p-dialog .p-inputtext,
+.p-dialog .p-inputtextarea,
+.p-dialog .p-dropdown {
+    width: 100%;
+    /* Full width inputs */
+    padding: 1rem;
+    /* Padding for input text */
+    /* border-radius: 4px; */
+    /* Slightly rounded borders for inputs */
+    border: 1px solid #ccc;
+    /* Light grey border */
+}
+
+.p-dialog .p-inputtext:focus,
+.p-dialog .p-inputtextarea:focus {
+    border-color: #805ad5;
+    /* Highlight with purple border on focus */
+}
+
+.p-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon {
+    color: white;
+    /* Sets the icon color to white */
+}
+
+/* Alternatively, if the icon is not changing, ensure specificity is high enough or !important is used
+.p-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-close-icon {
+    color: white !important; /* Overrides other styles if necessary */
