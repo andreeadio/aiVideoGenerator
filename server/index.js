@@ -40,7 +40,7 @@ app.use('/api/auth', authRouter);
 app.use('/api', authenticateToken, videoRouter);
 app.use('/api', authenticateToken, imageRouter);
 app.use('/api', authenticateToken, audioRouter);
-app.use('/api', authenticateToken, descriptionRoutes);
+app.use('/api', authenticateToken, descriptionRouter);
 
 
 

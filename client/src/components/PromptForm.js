@@ -45,12 +45,15 @@ function PromptForm({ onSubmit }) {
                 }
             );
             setPrompts(response.data.descriptions);
+            setDialogVisible(false);
+
         } catch (error) {
             console.error('Error generating descriptions:', error);
         } finally {
             setDescriptionsLoading(false);
         }
     };
+
     const dialogFooter = (
         <div>
             <Button label="Generate" icon="pi pi-check" onClick={handleGenerateDescriptions} autoFocus />
