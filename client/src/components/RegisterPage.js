@@ -107,6 +107,16 @@ const RegisterPage = () => {
                             feedback={false}
                         />
                     </div>
+                    <div className="p-field">
+                        <label htmlFor="password">Confirm Password</label>
+                        <Password
+                            id="password"
+                            value={password}
+                            // onChange={(e) => setPassword(e.target.value)}
+                            placeholder="password"
+                            feedback={false}
+                        />
+                    </div>
                 </div>
                 <div className="p-fluid">
                     <Button label="Register" icon="pi pi-user-plus" onClick={handleRegister} className="p-button-primary" />

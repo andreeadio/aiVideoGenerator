@@ -16,9 +16,11 @@ const WelcomePage = () => {
 
     return (
         <div className="app-container">
-            {/* <div className="background-animation"></div> */}
-            <div className="content">
-                <h1>Welcome to the Video Generator</h1>
+            <div className="background-animation"></div>
+            <div className="welcome-content">
+                <img src="/logo.webp" alt="Logo" className="logo-welcome" />
+                <h1>Welcome to CreatiVideo</h1>
+
                 <p>Create videos with ease using AI generation.</p>
                 <Button label="Get Started" onClick={handleGetStarted} icon="pi pi-sign-in" className="p-button-primary" />
             </div>
