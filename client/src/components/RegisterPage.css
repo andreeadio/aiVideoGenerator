@@ -3,6 +3,7 @@ body {
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
+    overflow-y: auto;
 }
 
 h1 {
@@ -16,17 +17,24 @@ h1 {
     justify-content: center;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    height: fit-content;
     background: linear-gradient(135deg, #9B59B6 25%, #0d0f63 75%);
+
+    overflow-y: auto;
 }
 
 .register-card {
-    width: 400px;
+    width: 100%;
+    max-width: 400px;
     height: 600px;
+    height: fit-content;
+    min-height: 600px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     background-color: #cfc1ee;
+
 }
 
 .p-field {
@@ -46,6 +54,7 @@ h1 {
 #email,
 #password,
 #surname,
+#confirmPassword,
 #name {
     height: 40px;
 }

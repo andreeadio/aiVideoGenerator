@@ -21,7 +21,6 @@ const userSchema = new mongoose.Schema({
     },
     surname: {
         type: String,
-        required: true,
     },
     createdAt: {
         type: Date,
