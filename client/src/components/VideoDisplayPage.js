@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
+
 import './VideoDisplayPage.css';
 
 function VideoDisplayPage() {
@@ -10,6 +12,7 @@ function VideoDisplayPage() {
     const initialVideoUrl = location.state ? location.state.videoUrl : '';
     const [videoUrl, setVideoUrl] = useState(initialVideoUrl);
     const [videos, setVideos] = useState([]);
+    const toast = useRef(null);
 
     useEffect(() => {
         const fetchVideos = async () => {
@@ -57,6 +60,8 @@ function VideoDisplayPage() {
 
     return (
         <div className="video-display-container">
+            <Toast ref={toast} />
+
             <Card title="Preview" className="video-card">
                 <video src={videoUrl} controls style={{ width: '100%' }} />
                 <div className="download-button">

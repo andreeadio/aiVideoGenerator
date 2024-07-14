@@ -1,5 +1,5 @@
 import './PromptForm.css';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -10,20 +10,22 @@ import { useNavigate } from 'react-router-dom';
 import { Panel } from 'primereact/panel';
 import { Dialog } from 'primereact/dialog'
 import { Card } from 'primereact/card'
+import { Toast } from 'primereact/toast';
 
 import { Accordion, AccordionTab } from 'primereact/accordion';
+import LoadingOverlay from './LoadingOverlay';
 
 function PromptForm({ onSubmit }) {
     const [prompts, setPrompts] = useState(['']);
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState([]);
-    const [videoLoading, setVideoLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
     //scenes
     const [numScenes, setNumScenes] = useState(1);
     const [topic, setTopic] = useState('');
-    const [descriptionsLoading, setDescriptionsLoading] = useState(false);
+    const [pageLoading, setPageLoading] = useState(false);
+
 
     //*audio    
     const [dialogVisible, setDialogVisible] = useState(false);
@@ -31,8 +33,45 @@ function PromptForm({ onSubmit }) {
     const [audioFile, setAudioFile] = useState(null);
     const [audioId, setAudioId] = useState(null);
 
+    //errors
+    const [errors, setErrors] = useState({})
+    const toast = useRef(null)
+    const validateDialog = () => {
+        let tempErrors = {}
+        let isValid = true
+
+        if (!topic) {
+            tempErrors.topic = 'This field is required!'
+            isValid = false
+        }
+
+        if (!numScenes) {
+            tempErrors.numScenes = 'This field is required!'
+            isValid = false
+        } else if (numScenes > 10 || numScenes < 0) {
+            tempErrors.numScenes = 'Input a maximum of 10 scenes!'
+            isValid = false
+        }
+
+
+        setErrors(tempErrors)
+        return isValid
+    }
+
     const handleGenerateDescriptions = async () => {
-        setDescriptionsLoading(true);
+
+
+        if (!validateDialog()) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Form is not valid',
+                life: 3000
+            })
+            return;
+        }
+        setPageLoading(true);
+        setDialogVisible(false);
 
         try {
             const token = localStorage.getItem('token');
@@ -47,11 +86,15 @@ function PromptForm({ onSubmit }) {
             );
             setPrompts(response.data.descriptions);
             setDialogVisible(false);
+            // setPageLoading(false);
 
         } catch (error) {
             console.error('Error generating descriptions:', error);
         } finally {
-            setDescriptionsLoading(false);
+            setDialogVisible(false);
+            setPageLoading(false);
+            setNumScenes(1); // Reset numScenes
+            setTopic(''); // Reset topic
         }
     };
 
@@ -144,7 +187,7 @@ function PromptForm({ onSubmit }) {
     };
 
     const handleGenerateVideo = async () => {
-        setVideoLoading(true);
+        setPageLoading(true);
 
         try {
             const token = localStorage.getItem('token');
@@ -164,33 +207,47 @@ function PromptForm({ onSubmit }) {
             navigate('/video', { state: { videoUrl: `http://localhost:8080${response.data.videoUrl}` } });
         } catch (error) {
             console.error('Error generating video:', error);
+            setPageLoading(false);
+
         } finally {
-            setVideoLoading(false);
+            setPageLoading(false);
+
         }
     };
 
     return (
         <div>
-
+            <Toast ref={toast} />
+            <LoadingOverlay visible={pageLoading} />
             <div className="container">
 
+
                 <Button label="AI Scenes" icon="pi pi-sparkles" onClick={() => setDialogVisible(true)} className='p-button-help' />
-                <Dialog header="Generate Scene Descriptions" visible={dialogVisible} style={{ width: '50vw' }} footer={dialogFooter} onHide={() => setDialogVisible(false)}>
+                {errors.api && <p className="error-message">{errors.api}</p>}
+                <Dialog header="Generate Scene Descriptions" visible={dialogVisible} style={{ width: '50vw' }} footer={dialogFooter}
+                    onHide={() => {
+                        setErrors({});
+                        setNumScenes(1);
+                        setTopic('');
+                        setDialogVisible(false)
+                    }}>
+
                     <div className='dialog-content'>
                         <div className="p-fluid">
                             <div className="p-field">
                                 <label htmlFor="numScenes">Number of Scenes:</label>
                                 <InputNumber id="numScenes" value={numScenes} onValueChange={(e) => setNumScenes(e.value)} />
+                                {errors.numScenes && <small className="p-error">{errors.numScenes}</small>}
                             </div>
                         </div>
                         <div className="p-fluid">
                             <div className="p-field">
                                 <label htmlFor="topic">Topic:</label>
                                 <InputTextarea id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} autoResize />
+                                {errors.topic && <small className="p-error">{errors.topic}</small>}
                             </div>
                         </div>
                     </div>
-                    {descriptionsLoading && <ProgressSpinner />}
                 </Dialog>
 
 
@@ -269,12 +326,10 @@ function PromptForm({ onSubmit }) {
                         label="Generate Video"
                         icon="pi pi-video"
                         onClick={handleGenerateVideo}
-                        disabled={loading.includes(true) || videoLoading}
+                        disabled={loading.includes(true) || pageLoading}
                         className="generate-video-button"
                     />
                 </form>
-
-
             </div>
         </div>
     );
