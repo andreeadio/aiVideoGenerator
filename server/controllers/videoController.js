@@ -26,10 +26,10 @@ const getAudioDuration = (filePath) => {
 const generateVideo = async (req, res) => {
     const { prompts: rawPrompts, duration, audioId } = req.body;
 
-    if (!audioId) {
-        console.error('Audio ID is missing');
-        return res.status(400).json({ error: 'Audio ID is required' });
-    }
+    // if (!audioId) {
+    //     console.error('Audio ID is missing');
+    //     return res.status(400).json({ error: 'Audio ID is required' });
+    // }
 
     // Parse prompts JSON
     let prompts;
@@ -106,80 +106,112 @@ const generateVideo = async (req, res) => {
 
         const videoBuilder = videoshow(images, videoOptions);
 
-        const audioRecord = await Audio.findById(audioId);
+        if (audioId) {
+            const audioRecord = await Audio.findById(audioId);
 
-        if (!audioRecord) {
-            console.error('Audio file not found in database');
-            throw new Error('Audio file not found in database');
-        }
+            if (!audioRecord) {
+                console.error('Audio file not found in database');
+                throw new Error('Audio file not found in database');
+            }
 
-        const audioFilePath = path.join(outputDir, `temp-audio-${uuidv4()}.mp3`);
-        await fs.writeFile(audioFilePath, audioRecord.data);
+            const audioFilePath = path.join(outputDir, `temp-audio-${uuidv4()}.mp3`);
+            await fs.writeFile(audioFilePath, audioRecord.data);
 
-        const audioDuration = await getAudioDuration(audioFilePath);
-        const videoDuration = prompts.length * duration;
+            const audioDuration = await getAudioDuration(audioFilePath);
+            const videoDuration = prompts.length * duration;
 
-        let processedAudioPath = audioFilePath;
+            let processedAudioPath = audioFilePath;
 
-        if (audioDuration < videoDuration) {
-            // Loop the audio if it's shorter than the video duration
-            const loopedAudioPath = path.join(outputDir, `looped-audio-${uuidv4()}.mp3`);
-            await new Promise((resolve, reject) => {
-                ffmpeg(audioFilePath)
-                    .inputOptions(['-stream_loop', '-1']) // Loop the audio
-                    .duration(videoDuration) // Set the duration to match the video
-                    .save(loopedAudioPath)
-                    .on('end', () => resolve(loopedAudioPath))
-                    .on('error', (err) => reject(err));
-            });
-            processedAudioPath = loopedAudioPath;
-        } else if (audioDuration > videoDuration) {
-            // Truncate the audio if it's longer than the video duration
-            const truncatedAudioPath = path.join(outputDir, `truncated-audio-${uuidv4()}.mp3`);
-            await new Promise((resolve, reject) => {
-                ffmpeg(audioFilePath)
-                    .setDuration(videoDuration) // Truncate the audio to match the video duration
-                    .save(truncatedAudioPath)
-                    .on('end', () => resolve(truncatedAudioPath))
-                    .on('error', (err) => reject(err));
-            });
-            processedAudioPath = truncatedAudioPath;
-        }
-
-        videoBuilder.audio(processedAudioPath);
-
-        videoBuilder
-            .save(videoPath)
-            .on('start', (command) => {
-                console.log('ffmpeg process started:', command);
-            })
-            .on('error', async (err, stdout, stderr) => {
-                console.error('Error:', err);
-                console.error('ffmpeg stderr:', stderr);
-                for (const imagePath of tempImages) {
-                    await fs.remove(imagePath);
-                }
-                res.status(500).send('Error generating video');
-            })
-            .on('end', async (output) => {
-                console.log('Video created in:', output);
-                for (const imagePath of tempImages) {
-                    await fs.remove(imagePath);
-                }
-                if (processedAudioPath !== audioFilePath) {
-                    await fs.remove(processedAudioPath);
-                }
-                await fs.remove(audioFilePath);
-
-                const video = new Video({
-                    videoUrl: `/output/${path.basename(videoPath)}`,
-                    userId,
+            if (audioDuration < videoDuration) {
+                // Loop the audio if it's shorter than the video duration
+                const loopedAudioPath = path.join(outputDir, `looped-audio-${uuidv4()}.mp3`);
+                await new Promise((resolve, reject) => {
+                    ffmpeg(audioFilePath)
+                        .inputOptions(['-stream_loop', '-1']) // Loop the audio
+                        .duration(videoDuration) // Set the duration to match the video
+                        .save(loopedAudioPath)
+                        .on('end', () => resolve(loopedAudioPath))
+                        .on('error', (err) => reject(err));
                 });
+                processedAudioPath = loopedAudioPath;
+            } else if (audioDuration > videoDuration) {
+                // Truncate the audio if it's longer than the video duration
+                const truncatedAudioPath = path.join(outputDir, `truncated-audio-${uuidv4()}.mp3`);
+                await new Promise((resolve, reject) => {
+                    ffmpeg(audioFilePath)
+                        .setDuration(videoDuration) // Truncate the audio to match the video duration
+                        .save(truncatedAudioPath)
+                        .on('end', () => resolve(truncatedAudioPath))
+                        .on('error', (err) => reject(err));
+                });
+                processedAudioPath = truncatedAudioPath;
+            }
 
-                await video.save();
+            videoBuilder.audio(processedAudioPath);
 
-                res.json({ videoUrl: video.videoUrl });
-            });
+            videoBuilder
+                .save(videoPath)
+                .on('start', (command) => {
+                    console.log('ffmpeg process started:', command);
+                })
+                .on('error', async (err, stdout, stderr) => {
+                    console.error('Error:', err);
+                    console.error('ffmpeg stderr:', stderr);
+                    for (const imagePath of tempImages) {
+                        await fs.remove(imagePath);
+                    }
+                    res.status(500).send('Error generating video');
+                })
+                .on('end', async (output) => {
+                    console.log('Video created in:', output);
+                    for (const imagePath of tempImages) {
+                        await fs.remove(imagePath);
+                    }
+                    if (processedAudioPath !== audioFilePath) {
+                        await fs.remove(processedAudioPath);
+                    }
+                    await fs.remove(audioFilePath);
+
+                    const video = new Video({
+                        videoUrl: `/output/${path.basename(videoPath)}`,
+                        userId,
+                    });
+
+                    await video.save();
+
+                    res.json({ videoUrl: video.videoUrl });
+                });
+        } else {
+            // No audio case
+            videoBuilder
+                .save(videoPath)
+                .on('start', (command) => {
+                    console.log('ffmpeg process started:', command);
+                })
+                .on('error', async (err, stdout, stderr) => {
+                    console.error('Error:', err);
+                    console.error('ffmpeg stderr:', stderr);
+                    for (const imagePath of tempImages) {
+                        await fs.remove(imagePath);
+                    }
+                    res.status(500).send('Error generating video');
+                })
+                .on('end', async (output) => {
+                    console.log('Video created in:', output);
+                    for (const imagePath of tempImages) {
+                        await fs.remove(imagePath);
+                    }
+
+                    const video = new Video({
+                        videoUrl: `/output/${path.basename(videoPath)}`,
+                        userId,
+                    });
+
+                    await video.save();
+
+                    res.json({ videoUrl: video.videoUrl });
+                });
+        }
 
     } catch (error) {
         console.error('Error generating video:', error);
