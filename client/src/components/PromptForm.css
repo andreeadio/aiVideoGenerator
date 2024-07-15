@@ -71,6 +71,28 @@ body {
 
 }
 
+
+.p-tooltip .p-tooltip-text {
+    background-color: #333;
+    /* Background color */
+    color: #fff;
+    /* Text color */
+    font-size: 14px;
+    /* Font size */
+    border-radius: 5px;
+    /* Border radius */
+    padding: 10px 16px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+}
+
+.p-tooltip-arrow {
+    color: #333;
+    /* Arrow color (same as background color) */
+}
+
+
 .p-button-help {
     padding: 10px 16px;
     background-color: #3b82f6;

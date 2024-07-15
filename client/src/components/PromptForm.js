@@ -12,6 +12,8 @@ import { Dialog } from 'primereact/dialog'
 import { Card } from 'primereact/card'
 import { Toast } from 'primereact/toast';
 
+import { Tooltip } from 'primereact/tooltip';
+
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import LoadingOverlay from './LoadingOverlay';
 
@@ -263,6 +265,7 @@ function PromptForm({ onSubmit }) {
                                     onChange={(e) => handleChange(e, index)}
                                     placeholder="Description here..."
                                     className="full-width"
+                                    disabled={loading[index]}
                                 />
                             </div>
                             <div className="button-group">
@@ -271,14 +274,14 @@ function PromptForm({ onSubmit }) {
                                     severity="danger"
                                     tooltip="Delete"
                                     className="p-button-danger"
-                                    tooltipOptions={{ position: 'center' }}
+                                    tooltipOptions={{ position: 'top' }}
                                     onClick={() => deletePrompt(index)}
                                     disabled={loading[index]}
                                 />
                                 <Button
                                     icon="pi pi-arrow-right"
                                     tooltip="Generate"
-                                    tooltipOptions={{ position: 'center' }}
+                                    tooltipOptions={{ position: 'bottom' }}
                                     onClick={() => generateImage(prompt, index)}
                                     disabled={loading[index]}
                                 />
