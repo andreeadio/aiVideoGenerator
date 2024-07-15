@@ -23,6 +23,8 @@ function PromptForm({ onSubmit }) {
     const [loading, setLoading] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
 
+    const [overallLoading, setOverallLoading] = useState(false); // New state to track overall loading status
+
     //scenes
     const [numScenes, setNumScenes] = useState(1);
     const [topic, setTopic] = useState('');
@@ -108,6 +110,7 @@ function PromptForm({ onSubmit }) {
 
 
 
+
     const handleAudioUpload = async (event) => {
         const file = event.files[0];
         setAudioFile(file);
@@ -128,6 +131,12 @@ function PromptForm({ onSubmit }) {
 
             setAudioId(response.data.audioId);
             console.log('Audio ID:', response.data.audioId);
+            toast.current.show({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Audio file uploaded successfully!',
+                life: 3000
+            })
         } catch (error) {
             console.error('Error uploading audio:', error);
         }
@@ -144,6 +153,18 @@ function PromptForm({ onSubmit }) {
     const addPrompt = () => setPrompts([...prompts, '']);
 
     const generateImage = async (prompt, index) => {
+
+        if (!prompt.trim()) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'A scene description is required',
+                life: 3000
+            })
+            return;
+        }
+
+        setOverallLoading(true);
         setLoading((prevLoading) => {
             const newLoading = [...prevLoading];
             newLoading[index] = true;
@@ -178,6 +199,7 @@ function PromptForm({ onSubmit }) {
                 newLoading[index] = false;
                 return newLoading;
             });
+            setOverallLoading(false);
         }
     };
 
@@ -189,6 +211,16 @@ function PromptForm({ onSubmit }) {
     };
 
     const handleGenerateVideo = async () => {
+        if (duration < 1) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Scene duration is not valide',
+                life: 3000
+            })
+            return;
+        }
+
         setPageLoading(true);
 
         try {
@@ -196,7 +228,10 @@ function PromptForm({ onSubmit }) {
             const formData = new FormData();
             formData.append('prompts', JSON.stringify(prompts));
             formData.append('duration', duration);
-            formData.append('audioId', audioId); // Send the audio ID
+            if (audioId) {
+                formData.append('audioId', audioId); // Only append audioId if it exists
+            }
+            // formData.append('audioId', audioId); // Send the audio ID
 
             const response = await axios.post('http://localhost:8080/api/generate-video', formData, {
                 headers: {
@@ -276,15 +311,23 @@ function PromptForm({ onSubmit }) {
                                     className="p-button-danger"
                                     tooltipOptions={{ position: 'top' }}
                                     onClick={() => deletePrompt(index)}
-                                    disabled={loading[index]}
+                                    disabled={loading[index] || overallLoading}
                                 />
                                 <Button
                                     icon="pi pi-arrow-right"
                                     tooltip="Generate"
                                     tooltipOptions={{ position: 'bottom' }}
                                     onClick={() => generateImage(prompt, index)}
-                                    disabled={loading[index]}
+                                    disabled={loading[index] || overallLoading} // Disable if any image is being generated
                                 />
+
+                                {/* <Button
+                                    icon="pi pi-arrow-right"
+                                    tooltip="Generate"
+                                    tooltipOptions={{ position: 'bottom' }}
+                                    onClick={() => generateImage(prompt, index)}
+                                    disabled={loading[index]}
+                                /> */}
                             </div>
                             {loading[index] ? (
                                 <ProgressSpinner style={{ width: '50px', height: '50px' }} />
@@ -329,7 +372,7 @@ function PromptForm({ onSubmit }) {
                         label="Generate Video"
                         icon="pi pi-video"
                         onClick={handleGenerateVideo}
-                        disabled={loading.includes(true) || pageLoading}
+                        disabled={pageLoading || overallLoading}
                         className="generate-video-button"
                     />
                 </form>
